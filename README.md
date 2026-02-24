@@ -1,5 +1,5 @@
 # Habitos-Atomicos  
-## Si se quiere empezar de 0:  
+### Si se quiere empezar de 0:  
 El proyecto de Habitos atomicos consta de backend simple y un frontend, para iniciar el backend, se debe tener la plantilla de expressjs, instalar las dependencias incluidas en dicha plantilla con:  
 `npm install`  
 se debe crear un .env, una carpeta config con un archivo js llamado database.  
@@ -24,7 +24,7 @@ Se crea una carpeta models y se introduce un archivo js para la clase habitos o 
 Dentro de este archivo, se exporta el requerimiento de mongoose y se crea un schema de los habitos, siendo este un `mongoose.Schema`  
 El hábito está en formato json, y debe llevar un título con el tipo string y que sea requerido/obligatorio, una descripción del tipo string, también obligatorio, y una fecha, del tipo date que utiliza el método Datenow como default, para que se agregue automáticamente la fecha en la que se agregó el hábito, luego se exporta un modelo de mongoose ('Habit', habitschema); para que se guarde con formato.  
   
-## Si se quiere empezar directamente el backend o el proyecto:  
+### Si se quiere empezar directamente el backend o el proyecto:  
 Para empezar el proyecto, solo se debe usar   
 `npm start`  
 En una terminal dentro del proyecto.  
