@@ -1,31 +1,64 @@
 var express = require('express');
 var router = express.Router();
 const Habit = require('../models/Habit');
+const jwt = require('jsonwebtoken');
+var mongoose = require('mongoose');
+
+  // autenticacion de token
+const authenticateToken = (req, res, next) => {
+  const token = req.header('Authorization');
+  if (!token) {
+    return res.status(401).json({ error: "Acceso denegado. Token no proporcionado." });
+  }
+
+  try {
+    const tokenWithoutBearer = token.replace("Bearer ", "");
+    const verified = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(403).json({ error: "Token inválido o expirado" });
+  }
+};
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/habits', async (req, res) => {
+
+// endpoint de consulta de habitos con token para usuario con id
+router.get('/habits', authenticateToken, async (req, res) => {
   try{
-  const habits = await Habit.find();
+  let userId = req. user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error retrieving habits' });;
+  const habits = await Habit.find({ 'userId': new mongoose.Types.ObjectId(userId)});
   res.json(habits);
   }catch(err){
-    res.status(500).json({ message: 'Error retrieving habits' })
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving habits' });
   }
 });
-router.post('/habits', async (req, res) => {
+
+
+// endpoint para agregar habitos con usuario id
+router.post('/habits', authenticateToken, async (req, res) => {
   try {
-  const {title, description } = req.body;
-  const habit = new Habit({title, description });
+  let {title, description } = req.body;
+  let userId = req.user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error retrieving habits' });;
+  userId = new mongoose.Types.ObjectId(userId);
+  const habit = new Habit({title, description, userId });
   await habit.save();
   res.json(habit);
   }catch(err){
-    res.status.apply(400).json({ message: 'Error creating habit'})
+    console.error(err);
+    res.status(400).json({ message: 'Error creating habit'})
   }
 });
-router.delete('/habits/:id', async (req, res) => {
+
+// endpoint para borrar habitos por ID
+router.delete('/habits/:id', authenticateToken, async (req, res) => {
   try{
     await Habit.findByIdAndDelete(req.params.id);
     req.json({ message: 'Habit deleted'});
@@ -33,7 +66,9 @@ router.delete('/habits/:id', async (req, res) => {
   res.status.apply(500).json({ message: 'Habit not found'});
 }
 });
-router.patch('/habits/marksasdone/:id', async (req, res) => {
+
+// Endpoint para marcar habitos por id
+router.patch('/habits/markasdone/:id', authenticateToken, async (req, res) => {
   try {
     const habit = await Habit.findById(req.params.id);
     habit.lastDone = new Date();
@@ -43,7 +78,7 @@ router.patch('/habits/marksasdone/:id', async (req, res) => {
       habit.save();
       res.status(200).json({ 'message': 'Habit marked as done'});
     }else{
-      habits.days = 0;
+      habit.days = 0;
       habit.lastUpdate = new Date();
       habit.startedAt = new Date();
       habit.save();
@@ -55,11 +90,12 @@ router.patch('/habits/marksasdone/:id', async (req, res) => {
   }
 });
 
+// Encontrar diferencia de horas para marcar el ID
 const timeDifferenceInHours = (date1, date2) =>{
   const differenceMs = Math.abs(date1 - date2);
   return differenceMs / (1000 * 60 * 60);
 }
-const timeDifferenceInDays = (date, date2) =>{
+const timeDifferenceInDays = (date1, date2) =>{
   const differenceMs = Math.abs(date1 - date2);
   return Math.floor(differenceMs / (1000 * 60 * 60 * 24));
 }

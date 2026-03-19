@@ -14,9 +14,11 @@ router.post('/register', async function(req, res, next) {
   try {
     const { username, password } = req.body;
 
+    // Generacion de salt y hash utilizando bcrypt
     const salt = await bcrypt.genSalt(10);
-    const hashedpassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Guardar en la base de datos el usuario
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
@@ -27,18 +29,26 @@ router.post('/register', async function(req, res, next) {
 }
 });
 
+
+  // Loguear usuario
 router.post('/login', async function (req, res, next){
   try {
     const { username, password } = req.body;
-
+    
+    //  Buscar usuario en la base de datos
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ error: "Contraseña Incorrecta" });
+    
+    // Comparar password con el hash guardado
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
+    // Generar un JWT para la sesion
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('habitToken', token, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
+      secure: false, // Solo HTTPS usado
+      sameSite: 'lax', // Hace que no se envie a otras paginas
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
     res.json({ message: "Inicio de sesión exitoso", token });
