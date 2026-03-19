@@ -9,8 +9,13 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+
+// conexion a frontend con credenciales
 var app = express();
-app.use(cors());  
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true}));
+  
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
