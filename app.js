@@ -8,12 +8,15 @@ var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const isProduction = process.env.NODE_ENV === 'production';
 
 
 // conexion a frontend con credenciales
 var app = express();
-app.use(cors({
-  origin: "http://localhost:5173",
+app.use(cors({ 
+  origin: isProduction 
+  ? "https://habits-tracker-frontend.vercel.app"
+  :  "http://localhost:3001",
   credentials: true}));
   
 // view engine setup

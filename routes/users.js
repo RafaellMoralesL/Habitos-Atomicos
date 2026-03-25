@@ -37,7 +37,7 @@ router.post('/login', async function (req, res, next){
     
     //  Buscar usuario en la base de datos
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ error: "Contraseña Incorrecta" });
+    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
     // Comparar password con el hash guardado
     const isMatch = await bcrypt.compare(password, user.password);
@@ -45,10 +45,12 @@ router.post('/login', async function (req, res, next){
 
     // Generar un JWT para la sesion
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('habitToken', token, {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    res.cookie('habitToken',  token, {
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
-      secure: false, // Solo HTTPS usado
-      sameSite: 'lax', // Hace que no se envie a otras paginas
+      secure: isProduction, // Solo HTTPS usado
+      sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
     res.json({ message: "Inicio de sesión exitoso", token });
