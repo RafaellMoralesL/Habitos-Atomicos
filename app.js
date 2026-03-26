@@ -15,8 +15,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 var app = express();
 app.use(cors({ 
   origin: isProduction 
-  ? "https://habitos-frontend-kmzo.onrender.com/"
-  :  "http://localhost:3001",
+  ? "https://habitos-frontend-kmzo.onrender.com"
+  :  "http://localhost:5173",
   credentials: true}));
   
 // view engine setup
