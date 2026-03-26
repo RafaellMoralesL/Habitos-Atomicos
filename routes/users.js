@@ -49,15 +49,11 @@ router.post('/login', async function (req, res, next){
 
 
     res.cookie('habitToken',  token, {
-      httpOnly: true, // Previene acceso desde JS (XSS) = malo muy malo
+      httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
       secure: isProduction, // Solo HTTPS usado
       sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
-
-    console.log("JWT_SECRET length:", process.env.JWT_SECRET.length);
-    console.log("JWT_SECRET value:*", process.env.JWT_SECRET);
-
 
     res.json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
