@@ -47,6 +47,10 @@ router.post('/login', async function (req, res, next){
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     const isProduction = process.env.NODE_ENV === 'production';
 
+     console.log("Generando token para usuario:");
+    console.log("JWT_SECRET existe:", !!process.env.JWT_SECRET);
+
+
     res.cookie('habitToken',  token, {
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
       secure: isProduction, // Solo HTTPS usado
