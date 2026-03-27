@@ -46,12 +46,16 @@ router.post('/login', async function (req, res, next){
     if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
     // Comparar password con el hash guardado
+    console.log('=== DEBUG: Antes de bcrypt.compare');
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('=== DEBUG: bcrypt.compare result:', isMatch);
 
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
+   console.log('=== DEBUG: Antes de jwt.sign, JWT_SECRET:', process.env.JWT_SECRET);
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        console.log('=== DEBUG: jwt.sign completado, token:', token ? 'SÍ' : 'NO');
         const isProduction = process.env.NODE_ENV === 'production';
 
 
