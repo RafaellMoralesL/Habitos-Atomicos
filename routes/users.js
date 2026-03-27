@@ -65,10 +65,10 @@ router.post('/register', async function(req, res, next) {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
    //
    console.log('isProduction:', process.env.NODE_ENV === 'production'); 
+   console.log('Token generado:', token);
    //
         const isProduction = process.env.NODE_ENV === 'production';
 
-        console.log('Antes de set cookie, token:');
 
     res.cookie('habitToken',  token, {
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
