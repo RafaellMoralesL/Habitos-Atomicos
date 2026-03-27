@@ -63,8 +63,12 @@ router.post('/register', async function(req, res, next) {
     console.log('user._id:', user._id);
 //
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+   //
+   console.log('isProduction:', process.env.NODE_ENV === 'production'); 
+   //
         const isProduction = process.env.NODE_ENV === 'production';
 
+        console.log('Antes de set cookie, token:');
 
     res.cookie('habitToken',  token, {
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
@@ -72,6 +76,8 @@ router.post('/register', async function(req, res, next) {
       sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
+
+    console.log('Antes de json');
 
     res.json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
