@@ -36,7 +36,13 @@ router.post('/login', async function (req, res, next){
     const { username, password } = req.body;
     
     //  Buscar usuario en la base de datos
-   const user = await User.findOne({ username });
+  // const user = await User.findOne({ username });
+  console.log('=== DEBUG: Buscando usuario con username:', username);
+  const user = await User.findOne({ username });
+  console.log('=== DEBUG: user encontrado:', user);
+  console.log('=== DEBUG: typeof user:', typeof user);
+  console.log('=== DEBUG: user === null:', user === null);
+  console.log('=== DEBUG: !user:', !user);
     if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
     // Comparar password con el hash guardado
