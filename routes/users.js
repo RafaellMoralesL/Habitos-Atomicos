@@ -53,21 +53,28 @@ router.post('/login', async function (req, res, next){
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
-   console.log('=== DEBUG: Antes de jwt.sign, JWT_SECRET:', process.env.JWT_SECRET);
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        console.log('=== DEBUG: jwt.sign completado, token:', token ? 'SÍ' : 'NO');
-        const isProduction = process.env.NODE_ENV === 'production';
-
-
+ // Generar un JWT para la sesion
+    console.log('=== DEBUG: Antes de jwt.sign, JWT_SECRET:', process.env.JWT_SECRET);
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    console.log('=== DEBUG: jwt.sign completado, token:', token ? 'SÍ' : 'NO');
+    console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de crear isProduction');
+    
+    const isProduction = process.env.NODE_ENV === 'production';
+    console.log('=== DEBUG: isProduction creado:', isProduction);
+    console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de enviar respuesta');
     res.cookie('habitToken',  token, {
-      httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
-      secure: isProduction, // Solo HTTPS usado
-      sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
-
+    console.log('=== DEBUG: Cookie enviada');
+    
     res.json({ message: "Inicio de sesión exitoso", token });
+    console.log('=== DEBUG: JSON enviado OK');
   } catch (error) {
+      console.log('=== ERROR EN CATCH PRINCIPAL:', error);
+      console.log('=== ERROR STACK:', error.stack);
       res.status(500).json({ error: "Error en el login", "description":error.toString() });
 }
 });
