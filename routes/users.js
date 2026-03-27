@@ -59,6 +59,9 @@ router.post('/register', async function(req, res, next) {
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+    console.log('user._id:', user._id);
+//
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         const isProduction = process.env.NODE_ENV === 'production';
 
