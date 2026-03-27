@@ -60,12 +60,16 @@ router.post('/login', async function (req, res, next){
     console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de crear isProduction');
     
     const isProduction = process.env.NODE_ENV === 'production';
+
+    const sameSiteValue = isProduction ? 'none' : 'Lax';
+    console.log('=== DEBUG: sameSiteValue:', sameSiteValue, 'type:', typeof sameSiteValue);
+    
     console.log('=== DEBUG: isProduction creado:', isProduction);
     console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de enviar respuesta');
     res.cookie('habitToken',  token, {
       httpOnly: false,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: String(sameSiteValue),
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
     console.log('=== DEBUG: Cookie enviada');
@@ -73,8 +77,6 @@ router.post('/login', async function (req, res, next){
     res.json({ message: "Inicio de sesión exitoso", token });
     console.log('=== DEBUG: JSON enviado OK');
   } catch (error) {
-      console.log('=== ERROR EN CATCH PRINCIPAL:', error);
-      console.log('=== ERROR STACK:', error.stack);
       res.status(500).json({ error: "Error en el login", "description":error.toString() });
 }
 });
