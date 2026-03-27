@@ -61,22 +61,30 @@ router.post('/login', async function (req, res, next){
     
     const isProduction = process.env.NODE_ENV === 'production';
 
-    const sameSiteValue = isProduction ? 'None' : 'Lax';
-    console.log('=== DEBUG: sameSiteValue:', sameSiteValue, 'type:', typeof sameSiteValue);
-
-    console.log('=== DEBUG: isProduction creado:', isProduction);
-    console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de enviar respuesta');
+   // Solución: usar valores exactos que acepta la librería cookie
+const sameSiteValue = isProduction ? 'None' : 'Lax';
+console.log('=== DEBUG: sameSiteValue:', sameSiteValue, 'type:', typeof sameSiteValue);
+console.log('=== DEBUG: Intentando crear cookie...');
 try {
-    res.cookie('habitToken',  token, {
-      httpOnly: false,
-      secure: isProduction,
-      sameSite: sameSiteValue,
-      maxAge: 7 * (24) * 60 * 60 * 1000
-    });
-    console.log('=== DEBUG: Cookie enviada OK');
-  } catch (cookieErr) {
-    console.log('=== ERROR EN COOKIE:', cookieErr);
-    console.log('=== ERROR COOKIE MESSAGE:', cookieErr.message);
+  // Solución: NO especificar sameSite = usar el default del navegador
+  const cookieOptions = {
+    httpOnly: false,
+    secure: isProduction,
+    maxAge: 7 * (24) * 60 * 60 * 1000
+  };
+  
+  // Agregar sameSite solo si NO es producción (Lax funciona bien en desarrollo)
+  if (!isProduction) {
+    cookieOptions.sameSite = 'lax';
+  }
+  
+  console.log('=== DEBUG: Cookie options:', cookieOptions);
+  
+  res.cookie('habitToken',  token, cookieOptions);
+  console.log('=== DEBUG: Cookie enviada OK');
+} catch (cookieErr) {
+  console.log('=== ERROR EN COOKIE:', cookieErr);
+  console.log('=== ERROR COOKIE MESSAGE:', cookieErr.message);
     console.log('=== ERROR COOKIE STACK:', cookieErr.stack);
     throw cookieErr;
   }
