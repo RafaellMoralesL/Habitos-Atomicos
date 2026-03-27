@@ -66,13 +66,20 @@ router.post('/login', async function (req, res, next){
 
     console.log('=== DEBUG: isProduction creado:', isProduction);
     console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de enviar respuesta');
+try {
     res.cookie('habitToken',  token, {
       httpOnly: false,
       secure: isProduction,
-      sameSite: String(sameSiteValue),
+      sameSite: sameSiteValue,
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
-    console.log('=== DEBUG: Cookie enviada');
+    console.log('=== DEBUG: Cookie enviada OK');
+  } catch (cookieErr) {
+    console.log('=== ERROR EN COOKIE:', cookieErr);
+    console.log('=== ERROR COOKIE MESSAGE:', cookieErr.message);
+    console.log('=== ERROR COOKIE STACK:', cookieErr.stack);
+    throw cookieErr;
+  }
     
     res.json({ message: "Inicio de sesión exitoso", token });
     console.log('=== DEBUG: JSON enviado OK');
