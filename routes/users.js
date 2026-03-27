@@ -31,16 +31,31 @@ router.post('/register', async function(req, res, next) {
 
 
   // Loguear usuario
-router.post('/login', async function (req, res, next){
-  try {
-    const { username, password } = req.body;
+//router.post('/login', async function (req, res, next){
+  //try {
+   // const { username, password } = req.body;
     
     //  Buscar usuario en la base de datos
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+   // const user = await User.findOne({ username });
+    //if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
     // Comparar password con el hash guardado
+    //const isMatch = await bcrypt.compare(password, user.password);
+
+    router.post('/login', async function (req, res, next){
+  try {
+    const { username, password } = req.body;
+    console.log('Username:', username);
+    console.log('Password recibido:', password);
+    console.log('Password length:', password?.length);
+    
+    const user = await User.findOne({ username });
+    console.log('Usuario encontrado:', user ? 'sí' : 'no');
+    console.log('Password en DB:', user?.password);
+    
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('bcrypt compare result:', isMatch);
+
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
