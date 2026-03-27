@@ -61,9 +61,9 @@ router.post('/login', async function (req, res, next){
     
     const isProduction = process.env.NODE_ENV === 'production';
 
-    const sameSiteValue = isProduction ? 'none' : 'Lax';
+    const sameSiteValue = isProduction ? 'None' : 'Lax';
     console.log('=== DEBUG: sameSiteValue:', sameSiteValue, 'type:', typeof sameSiteValue);
-    
+
     console.log('=== DEBUG: isProduction creado:', isProduction);
     console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de enviar respuesta');
     res.cookie('habitToken',  token, {
