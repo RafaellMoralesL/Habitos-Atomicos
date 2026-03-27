@@ -31,42 +31,21 @@ router.post('/register', async function(req, res, next) {
 
 
   // Loguear usuario
-//router.post('/login', async function (req, res, next){
-  //try {
-   // const { username, password } = req.body;
-    
-    //  Buscar usuario en la base de datos
-   // const user = await User.findOne({ username });
-    //if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-    
-    // Comparar password con el hash guardado
-    //const isMatch = await bcrypt.compare(password, user.password);
-
-    router.post('/login', async function (req, res, next){
+router.post('/login', async function (req, res, next){
   try {
     const { username, password } = req.body;
-    console.log('Username:', username);
-    console.log('Password recibido:', password);
-    console.log('Password length:', password?.length);
     
-    const user = await User.findOne({ username });
-    console.log('Usuario encontrado:', user ? 'sí' : 'no');
-    console.log('Password en DB:', user?.password);
+    //  Buscar usuario en la base de datos
+   const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
+    // Comparar password con el hash guardado
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('bcrypt compare result:', isMatch);
 
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
-    console.log('user._id:', user._id);
-//
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-   //
-   console.log('isProduction:', process.env.NODE_ENV === 'production'); 
-   console.log('Token generado:', token);
-   //
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         const isProduction = process.env.NODE_ENV === 'production';
 
 
@@ -76,8 +55,6 @@ router.post('/register', async function(req, res, next) {
       sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
-
-    console.log('Antes de json');
 
     res.json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
