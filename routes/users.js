@@ -36,61 +36,26 @@ router.post('/login', async function (req, res, next){
     const { username, password } = req.body;
     
     //  Buscar usuario en la base de datos
-  // const user = await User.findOne({ username });
-  console.log('=== DEBUG: Buscando usuario con username:', username);
-  const user = await User.findOne({ username });
-  console.log('=== DEBUG: user encontrado:', user);
-  console.log('=== DEBUG: typeof user:', typeof user);
-  console.log('=== DEBUG: user === null:', user === null);
-  console.log('=== DEBUG: !user:', !user);
+    const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
     
     // Comparar password con el hash guardado
-    console.log('=== DEBUG: Antes de bcrypt.compare');
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('=== DEBUG: bcrypt.compare result:', isMatch);
-
     if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     // Generar un JWT para la sesion
- // Generar un JWT para la sesion
-    console.log('=== DEBUG: Antes de jwt.sign, JWT_SECRET:', process.env.JWT_SECRET);
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    console.log('=== DEBUG: jwt.sign completado, token:', token ? 'SÍ' : 'NO');
-    console.log('=== DEBUG: >>> LLEGÓ HASTA AQUÍ, a punto de crear isProduction');
-    
-    const isProduction = process.env.NODE_ENV === 'production';
+        const isProduction = process.env.NODE_ENV === 'production';
 
-   // Solución: usar valores exactos que acepta la librería cookie
-const sameSiteValue = isProduction ? 'None' : 'Lax';
-console.log('=== DEBUG: sameSiteValue:', sameSiteValue, 'type:', typeof sameSiteValue);
-console.log('=== DEBUG: Intentando crear cookie...');
-try {
-  // Solución: NO especificar sameSite = usar el default del navegador
-  const cookieOptions = {
-    httpOnly: false,
-    secure: isProduction,
-    maxAge: 7 * (24) * 60 * 60 * 1000
-  };
-  
-  // Agregar sameSite solo si NO es producción (Lax funciona bien en desarrollo)
-  if (!isProduction) {
-    cookieOptions.sameSite = 'lax';
-  }
-  
-  console.log('=== DEBUG: Cookie options:', cookieOptions);
-  
-  res.cookie('habitToken',  token, cookieOptions);
-  console.log('=== DEBUG: Cookie enviada OK');
-} catch (cookieErr) {
-  console.log('=== ERROR EN COOKIE:', cookieErr);
-  console.log('=== ERROR COOKIE MESSAGE:', cookieErr.message);
-    console.log('=== ERROR COOKIE STACK:', cookieErr.stack);
-    throw cookieErr;
-  }
-    
+
+    res.cookie('habitToken',  token, {
+      httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
+      secure: isProduction, // Solo HTTPS usado
+      sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
+      maxAge: 7 * (24) * 60 * 60 * 1000
+    });
+
     res.json({ message: "Inicio de sesión exitoso", token });
-    console.log('=== DEBUG: JSON enviado OK');
   } catch (error) {
       res.status(500).json({ error: "Error en el login", "description":error.toString() });
 }
