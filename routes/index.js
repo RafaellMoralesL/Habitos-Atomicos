@@ -32,9 +32,10 @@ router.get('/', function(req, res, next) {
 // endpoint de consulta de habitos con token para usuario con id
 router.get('/habits', authenticateToken, async (req, res) => {
   try{
-  let userId = req. user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error retrieving habits' });;
-  const habits = await Habit.find({ 'userId': new mongoose.Types.ObjectId(userId)});
-  res.json(habits);
+       let userId = req. user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error retrieving habits' });;
+       console.log(req.user.userId);
+        const habits = await Habit.find({ 'userId': new mongoose.Types.ObjectId(userId)});
+        res.json(habits);
   }catch(err){
     console.error(err);
     res.status(500).json({ message: 'Error retrieving habits' });
@@ -45,12 +46,13 @@ router.get('/habits', authenticateToken, async (req, res) => {
 // endpoint para agregar habitos con usuario id
 router.post('/habits', authenticateToken, async (req, res) => {
   try {
-  let {title, description } = req.body;
-  let userId = req.user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error retrieving habits' });;
-  userId = new mongoose.Types.ObjectId(userId);
-  const habit = new Habit({title, description, userId });
-  await habit.save();
-  res.json(habit);
+    console.log(req.body);
+      let {title, description } = req.body;
+      let userId = req. user && req.user.userId ? req.user.userId: res.status(500).json({ message: 'Error creating habit' });;
+      userId = new mongoose.Types.ObjectId(userId);
+      const habit = new Habit({title, description, userId });
+      await habit.save();
+      res.json(habit);
   }catch(err){
     console.error(err);
     res.status(400).json({ message: 'Error creating habit'})

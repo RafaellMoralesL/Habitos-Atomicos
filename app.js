@@ -10,14 +10,14 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const isProduction = process.env.NODE_ENV === 'production';
 
-
 // conexion a frontend con credenciales
 var app = express();
 app.use(cors({ 
   origin: isProduction 
-  ? "https://habitos-frontend-xdzm.onrender.com"
+  ? "https://habits-tracker-frontend-vite-zj10.onrender.com"
   :  "http://localhost:5173",
-  credentials: true}));
+  credentials: true
+}));
   
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

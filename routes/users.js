@@ -45,9 +45,8 @@ router.post('/login', async function (req, res, next){
 
     // Generar un JWT para la sesion
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        const isProduction = process.env.NODE_ENV === 'production';
-
-
+     const isProduction = process.env.NODE_ENV === 'production';
+     
     res.cookie('habitToken',  token, {
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
       secure: isProduction, // Solo HTTPS usado
