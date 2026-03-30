@@ -52,6 +52,7 @@ router.post('/login', async function (req, res, next){
       httpOnly: false, // Previene acceso desde JS (XSS) = malo muy malo
       secure: isProduction, // Solo HTTPS usado
       sameSite: isProduction ? 'none' : 'lax', // Hace que no se envie a otras paginas
+      path: '/', // Cookie disponible en toda la app
       maxAge: 7 * (24) * 60 * 60 * 1000
     });
 
